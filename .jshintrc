@@ -1,0 +1,22 @@
+{ "globals": {}
+, "laxcomma": true
+, "laxbreak": true
+, "eqeqeq": true
+, "eqnull": true
+, "smarttabs": true
+, "globalstrict": true
+, "curly": false
+, "node": true
+, "expr": true
+, "devel": true
+, "debug": true
+, "funcscope": true
+, "unused": true
+, "bitwise": true
+, "validthis": true
+, "maxerr": 50
+, "-W058": false
+, "-W002": false
+, "-W004": false
+, "maxlen": 150
+}

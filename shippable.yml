@@ -1,0 +1,19 @@
+# language setting
+language: node_js
+
+# version numbers, testing against two versions of node
+node_js:
+  - 0.10.32
+  
+branches:
+  only:
+    - master
+    
+env:
+  global:
+    - APP_NAME=gefs-multiplayer-server
+    
+script: ":"
+   
+after_success:
+  - git push -f git@heroku.com:$APP_NAME.git master
