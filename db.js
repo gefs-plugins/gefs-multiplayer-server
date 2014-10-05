@@ -19,3 +19,18 @@ function getConnection() {
 }
 
 exports.getConnection = getConnection;
+
+var queries = {};
+var Promise = require('bluebird');
+var fs = require('fs');
+var path = require('path');
+
+function getQuery(name) {
+  if (name in queries) return Promise.resolve(queries[name]);
+  return fs.readFileAsync(path.join('query', name + '.sql'), { encoding: 'utf8' }).then(function (query) {
+    queries[name] = query;
+  });
+}
+
+exports.getQuery = getQuery;
+  

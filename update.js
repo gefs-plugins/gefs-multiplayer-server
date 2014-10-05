@@ -20,14 +20,12 @@ var Promise = require('bluebird');
 var url = require('url');
 var util = require('util');
 var db = require('./db.js');
-var fs = require('fs');
-var path = require('path');
 
 function update(req) {
   var paramToName =
-    { acid: 'accountID'
-    , sid: 'sessionID'
-    , id: 'ID'
+    { acid: 'accountid'
+    , sid: 'sessionid'
+    , id: 'id'
     , ac: 'aircraft'
     , la: 'latitude'
     , lo: 'longitude'
@@ -36,7 +34,7 @@ function update(req) {
     , t: 'tilt'
     , r: 'roll'
     , m: 'message'
-    , ci: 'messageID'
+    , ci: 'messageid'
     };
   
   var query = url.parse(req.url, true).query;
@@ -45,34 +43,39 @@ function update(req) {
     params[paramToName[i]] = query[i];
   }
   
-  var userID = params.accountID;  
-  var encoding = { encoding: 'utf8' };
-  var getUpdateQuery = fs.readFileAsync(path.join('query', 'updatecoords.sql'), encoding);
-  var getVisibleUserQuery = fs.readFileAsync(path.join('query', 'getnearplayers.sql'), encoding);
+  if (!params.accountid) Promise.reject(400, '400 Bad Request');
   
-  var updateData = [ params.latitude, params.longitude, params.altitude, params.heading, params.tilt, params.roll, userID ];
-  var visibleUserData = [ userID, +params.latitude, +params.longitude ];
+  var now = Date.now();
+  var getUpdateQuery = db.getQuery('updatecoords');
+  var getNumOfPlayersQuery = db.getQuery('numofplayers');
+  var getVisibleUserQuery = db.getQuery('getnearplayers');
   
-  return Promise.using(db.getConnection(), getUpdateQuery, getVisibleUserQuery, function (client, updateQuery, visiblePlayerQuery) {
+  var updateData = [ params.latitude, params.longitude, params.altitude, params.heading, params.tilt, params.roll, now, params.accountid ];
+  var visibleUserData = [ now - 15000, params.accountid, +params.latitude, +params.longitude ];
+  
+  return Promise.using(db.getConnection(), getUpdateQuery, getNumOfPlayersQuery, getVisibleUserQuery,
+                       function (client, updateQuery, numOfPlayersQuery, visiblePlayerQuery) {
     client.queryAsync(updateQuery, updateData);
     
-    var getNumOfPlayers = client.queryAsync('SELECT count(*) AS numOfPlayers FROM players WHERE lastUpdate > extract(epoch FROM now())::int - 15');
+    var getNumOfPlayers = client.queryAsync(numOfPlayersQuery, [ now - 15000 ]);
     var getVisibleUsers = client.queryAsync(visiblePlayerQuery, visibleUserData);
     
     return Promise.join(getNumOfPlayers, getVisibleUsers);
   }).spread(function (numOfPlayersResult, visibleUsersResult) {
-    var numOfPlayers = 0;
-    if (numOfPlayersResult[0] && numOfPlayersResult[0].numOfPlayers) numOfPlayers = numOfPlayersResult[0].numOfPlayers;
-    var visibleUsers = [].map.call(visibleUsersResult, function (row) {
+    var numOfPlayers = numOfPlayersResult.rows.length ? numOfPlayersResult.rows[0].numofplayers : 0;
+    
+    var visibleUsers = [].map.call(visibleUsersResult.rows, function (row) {
+      var userIDString = row.accountid + '';
+      
       var coords = [row.latitude, row.longitude, row.altitude, row.heading, row.tilt, row.roll];
-      return [userID, row.aircraft, row.callsign, coords, row.lastUpdate, null, 0, userID];
+      return [ userIDString, row.aircraft, row.callsign, coords, row.lastupdate, userIDString ];
     });
     
     // TODO: implement chat functionality
     var unreadMessages = [];
     var lastMessageID = 0;
     
-    return util.format('mpcbup(%j,%d,%j,%j,%d);', userID, numOfPlayers, visibleUsers, unreadMessages, lastMessageID);
+    return util.format('mpcbup(%j,%d,%j,%j,%d);', params.accountid, numOfPlayers, visibleUsers, unreadMessages, lastMessageID);
   });
 }
 
