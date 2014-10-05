@@ -43,15 +43,15 @@ function update(req) {
     params[paramToName[i]] = query[i];
   }
   
-  if (!params.accountid) Promise.reject(400, '400 Bad Request');
+  if (!params.accountid) return Promise.reject([400, '400 Bad Request']);
   
   var now = Date.now();
   var getUpdateQuery = db.getQuery('updatecoords');
   var getNumOfPlayersQuery = db.getQuery('numofplayers');
-  var getVisibleUserQuery = db.getQuery('getnearplayers');
+  var getVisibleUserQuery = db.getQuery('visibleplayers');
   
   var updateData = [ params.latitude, params.longitude, params.altitude, params.heading, params.tilt, params.roll, now, params.accountid ];
-  var visibleUserData = [ now - 15000, params.accountid, +params.latitude, +params.longitude ];
+  var visibleUserData = [ now - 15000, params.accountid, params.latitude, params.longitude ];
   
   return Promise.using(db.getConnection(), getUpdateQuery, getNumOfPlayersQuery, getVisibleUserQuery,
                        function (client, updateQuery, numOfPlayersQuery, visiblePlayerQuery) {
@@ -62,7 +62,7 @@ function update(req) {
     
     return Promise.join(getNumOfPlayers, getVisibleUsers);
   }).spread(function (numOfPlayersResult, visibleUsersResult) {
-    var numOfPlayers = numOfPlayersResult.rows.length ? numOfPlayersResult.rows[0].numofplayers : 0;
+    var numOfPlayers = numOfPlayersResult.rows.length ? numOfPlayersResult.rows[0].numofplayers : 1;
     
     var visibleUsers = [].map.call(visibleUsersResult.rows, function (row) {
       var userIDString = row.accountid + '';

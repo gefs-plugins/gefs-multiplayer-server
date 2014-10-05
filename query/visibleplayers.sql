@@ -1,8 +1,8 @@
 -- get other players <125km from current player using haversine formula
 
 SELECT * FROM players
-WHERE lastUpdate > ($1::double precision)
-AND accountID != $1::int
+WHERE lastUpdate > $1::bigint
+AND accountID != $2::int
 AND 6371.0087714 * 2 * asin(
   sqrt(
     pow(sin(radians(latitude - $3) / 2), 2) +

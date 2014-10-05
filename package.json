@@ -1,7 +1,7 @@
 { "name": "gefs-multiplayer-server"
 , "description": "An alternative multiplayer for GEFS-Online, the free flight simulator based on the Google Earth Plugin."
 , "license": "GPL-3.0+"
-, "version": "0.0.2"
+, "version": "0.0.3"
 , "main": "main.js"
 , "dependencies":
   { "bluebird": "^2.3.4"

@@ -29,6 +29,8 @@ function getQuery(name) {
   if (name in queries) return Promise.resolve(queries[name]);
   return fs.readFileAsync(path.join('query', name + '.sql'), { encoding: 'utf8' }).then(function (query) {
     queries[name] = query;
+    
+    return query;
   });
 }
 
