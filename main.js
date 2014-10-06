@@ -20,14 +20,18 @@ var server = http.createServer(function (req, res) {
   var body;
   
   function getErrorPage(arr) {
-    return fs.readFileAsync('error.html', { encoding: 'utf8' }).then(function (html) {
+    return fs.readFileAsync('error.html', { encoding: 'utf-8' }).then(function (html) {
       res.statuscode = arr[0];
       res.setHeader('Content-Type', 'text/html');
       return html.format(arr[1]);
     });
   }
   
-  if (pathname in files) {
+  if (pathname === process.env.LOADER_IO_VERIFICATION + '/') {
+    res.statuscode = 200;
+    res.setHeader('Content-Type', 'text/plain');
+    body = Promise.resolve(process.env.LOADER_IO_VERIFICATION);
+  } else if (pathname in files) {
     body = files[pathname](req).then(function (code) {
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/ecmascript');
