@@ -50,7 +50,7 @@ function update(req) {
   var getNumOfPlayersQuery = db.getQuery('numofplayers');
   var getVisibleUserQuery = db.getQuery('visibleplayers');
   
-  var updateData = [ params.latitude, params.longitude, params.altitude, params.heading, params.tilt, params.roll, now, params.accountid ];
+  var updateData = [ params.aircraft, params.latitude, params.longitude, params.altitude, params.heading, params.tilt, params.roll, now, params.accountid ];
   var visibleUserData = [ now - 15000, params.accountid, params.latitude, params.longitude ];
   
   return Promise.using(db.getConnection(), getUpdateQuery, getNumOfPlayersQuery, getVisibleUserQuery,
@@ -67,7 +67,7 @@ function update(req) {
     var visibleUsers = [].map.call(visibleUsersResult.rows, function (row) {
       var userIDString = row.accountid + '';
       
-      var coords = [row.latitude, row.longitude, row.altitude, row.heading, row.tilt, row.roll];
+      var coords = [ row.latitude, row.longitude, row.altitude, row.heading, row.tilt, row.roll ];
       return [ userIDString, row.aircraft, row.callsign, coords, row.lastupdate, userIDString ];
     });
     
