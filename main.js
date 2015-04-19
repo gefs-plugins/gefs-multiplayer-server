@@ -17,7 +17,7 @@ var files = { map: map, update: update };
 
 var server = http.createServer(function (req, res) {  
   
-  var pathname = url.parse(req.url).pathname.slice(1);
+  var pathname = url.parse(req.url).pathname.slice(2);
   console.log(pathname);
   var body;
   
