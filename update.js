@@ -43,7 +43,7 @@ function update(req) {
     params[paramToName[i]] = query[i];
   }
   
-  if (!params.accountid) params.accountid = params.accountid.replace(/\D/g, '').slice(0, 4);
+  if (!params.accountid) params.id = params.accountid = params.accountid.replace(/\D/g, '').slice(0, 4);
   
   var now = Date.now();
   var getUpdateQuery = db.getQuery('updatecoords');
