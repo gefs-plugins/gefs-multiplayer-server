@@ -22,6 +22,7 @@ var util = require('util');
 var db = require('./db.js');
 
 function update(req) {
+  console.log(1);
   var paramToName =
     { acid: 'accountid'
     , sid: 'sessionid'
