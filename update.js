@@ -58,7 +58,9 @@ function update(req) {
   return Promise.using(db.getConnection(), getUpdateQuery, getNumOfPlayersQuery, getVisibleUserQuery,
                        function (client, updateQuery, numOfPlayersQuery, visiblePlayerQuery) {
    
-    client.queryAsync(updateQuery, updateData);
+    client.queryAsync(updateQuery, updateData).catch(function () {
+      console.log(error);
+    });
     
     var getNumOfPlayers = client.queryAsync(numOfPlayersQuery, [ now - 15000 ]);
     var getVisibleUsers = client.queryAsync(visiblePlayerQuery, visibleUserData);
