@@ -47,18 +47,15 @@ function update(req) {
   
   var now = Date.now();
   var getUpdateQuery = db.getQuery('updatecoords');
-  var getUpdateQuery2 = db.getQuery('updatecoords2');
   var getNumOfPlayersQuery = db.getQuery('numofplayers');
   var getVisibleUserQuery = db.getQuery('visibleplayers');
   
   var updateData = [ params.aircraft, params.latitude, params.longitude, params.altitude, params.heading, params.tilt, params.roll, now, params.accountid ];
   var visibleUserData = [ now - 15000, params.accountid, params.latitude, params.longitude ];
   
-  return Promise.using(db.getConnection(), getUpdateQuery, getNumOfPlayersQuery, getVisibleUserQuery, getUpdateQuery2,
-                       function (client, updateQuery, numOfPlayersQuery, visiblePlayerQuery, updateQuery2) {
-    client.queryAsync(updateQuery, updateData).then(function () {
-      client.queryAsync(updateQuery2, updateData);
-    });
+  return Promise.using(db.getConnection(), getUpdateQuery, getNumOfPlayersQuery, getVisibleUserQuery,
+                       function (client, updateQuery, numOfPlayersQuery, visiblePlayerQuery) {
+    client.queryAsync(updateQuery, updateData);
     
     var getNumOfPlayers = client.queryAsync(numOfPlayersQuery, [ now - 15000 ]);
     var getVisibleUsers = client.queryAsync(visiblePlayerQuery, visibleUserData);
