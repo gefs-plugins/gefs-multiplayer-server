@@ -16,7 +16,9 @@ var update = require('./update.js');
 var files = { map: map, update: update };
 
 var server = http.createServer(function (req, res) {  
+  
   var pathname = url.parse(req.url).pathname.slice(1);
+  console.log(pathname);
   var body;
   
   function getErrorPage(arr) {
