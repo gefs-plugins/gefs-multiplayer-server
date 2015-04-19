@@ -32,6 +32,7 @@ var server = http.createServer(function (req, res) {
     res.setHeader('Content-Type', 'text/plain');
     body = Promise.resolve(process.env.LOADER_IO_VERIFICATION);
   } else if (pathname in files) {
+    console.log(0);
     body = files[pathname](req).then(function (code) {
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/ecmascript');
