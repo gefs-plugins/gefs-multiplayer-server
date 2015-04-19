@@ -45,6 +45,8 @@ function update(req) {
   
   if (!params.accountid) params.accountid = params.accountid.replace(/\D/g, '').slice(0, 4);
   
+  console.log(params.accountid);
+  
   var now = Date.now();
   var getUpdateQuery = db.getQuery('updatecoords');
   var getNumOfPlayersQuery = db.getQuery('numofplayers');
@@ -55,6 +57,7 @@ function update(req) {
   
   return Promise.using(db.getConnection(), getUpdateQuery, getNumOfPlayersQuery, getVisibleUserQuery,
                        function (client, updateQuery, numOfPlayersQuery, visiblePlayerQuery) {
+   
     client.queryAsync(updateQuery, updateData);
     
     var getNumOfPlayers = client.queryAsync(numOfPlayersQuery, [ now - 15000 ]);
